@@ -8,6 +8,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <time.h>
+#include <sys/time.h>
 
 static void die (const char * format, ...) {
         va_list vargs;
@@ -38,13 +39,18 @@ char *randstring(size_t length) {
 static const char FILETOCHECK[] = "/tmp/elastic/manualtest";
 
 void handle_session(int session_fd) {
+        struct timeval tval_start, tval_filewrite, tval_end;
+        gettimeofday(&tval_start, NULL);
         srand(time(NULL));
         char buffer[1024];
         FILE *fp = fopen(FILETOCHECK, "w+");
         char *r = randstring(16);
         fputs(r,fp);
         fclose(fp);
-        printf("Wrote to manualtest: %s\n",r);
+        gettimeofday(&tval_filewrite, NULL);
+        long seconds = (tval_filewrite.tv_sec - tval_start.tv_sec);
+        long micros = ((seconds * 1000000) + tval_filewrite.tv_usec) - (tval_start.tv_usec);
+        printf("Took %d seconds and %d microseconds to write to manualtest: %s\n",seconds,micros,r);
         size_t index=0;
         while(index<16) {
                 ssize_t count=write(session_fd,r+index,16-index);
@@ -55,7 +61,10 @@ void handle_session(int session_fd) {
                         index+=count;
                 }
         }
-        printf("Sent string to client: %s\n",r);
+        gettimeofday(&tval_end, NULL);
+        seconds = (tval_end.tv_sec - tval_filewrite.tv_sec);
+        micros = ((seconds * 1000000) + tval_end.tv_usec) - (tval_filewrite.tv_usec);
+        printf("Took %d seconds and %d microseconds to sent string to client: %s\n",seconds,micros,r);
         fflush(stdout);
         free(r);
 }
