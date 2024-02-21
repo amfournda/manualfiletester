@@ -12,6 +12,8 @@
 #include <sys/time.h>
 
 static const char FILETOCHECK[] = "/tmp/elastic/manualtest";
+static const char SERVERADDRESS[] = "127.0.0.1";
+static const int PORT = 4978;
 
 static void die (const char * format, ...) {
         va_list vargs;
@@ -33,8 +35,8 @@ int main(int argc, char *argv[]) {
         }
 
         serv_addr.sin_family = AF_INET;
-        serv_addr.sin_port = htons(4978);
-        inet_pton(AF_INET, "10.40.8.52", &serv_addr.sin_addr);
+        serv_addr.sin_port = htons(PORT);
+        inet_pton(AF_INET, SERVERADDRESS, &serv_addr.sin_addr);
 
         if(connect(sock,(struct sockaddr *)&serv_addr,sizeof(serv_addr)) < 0) {
                 die("failed to connect to server (errno=%d)",errno);

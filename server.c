@@ -10,6 +10,9 @@
 #include <time.h>
 #include <sys/time.h>
 
+static const char PORT[] = "4978";
+static const char FILETOCHECK[] = "/tmp/elastic/manualtest";
+
 static void die (const char * format, ...) {
         va_list vargs;
         va_start(vargs, format);
@@ -35,8 +38,6 @@ char *randstring(size_t length) {
     }
     return randomString;
 }
-
-static const char FILETOCHECK[] = "/tmp/elastic/manualtest";
 
 void handle_session(int session_fd) {
         struct timeval tval_start, tval_filewrite, tval_end;
@@ -71,7 +72,7 @@ void handle_session(int session_fd) {
 
 int main(int argc, char *argv[]) {
         const char* hostname=0; /* wildcard */
-        const char* portname="4978";
+        const char* portname=PORT;
         struct addrinfo hints;
         memset(&hints,0,sizeof(hints));
         hints.ai_family=AF_UNSPEC;
